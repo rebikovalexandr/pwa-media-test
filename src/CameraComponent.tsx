@@ -8,7 +8,7 @@ const CameraComponent = () => {
     useEffect(() => {
         const enableStream = async () => {
             try {
-                const mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode }, audio: true });
+                const mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode, echoCancellation: true }, audio: true });
                 setStream(mediaStream);
                 if (videoRef.current) {
                     videoRef.current.srcObject = mediaStream;
@@ -28,7 +28,12 @@ const CameraComponent = () => {
     }, [facingMode]);
 
     const toggleFacingMode = () => {
-        setFacingMode(prevMode => (prevMode === 'user' ? 'environment' : 'user'));
+        setFacingMode(prevMode => {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+            return prevMode === 'user' ? 'environment' : 'user'
+        });
     };
 
     return (
