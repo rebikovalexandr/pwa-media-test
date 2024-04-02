@@ -1,13 +1,12 @@
 
 import './App.css'
+import CameraComponent from './CameraComponent'
 
 function App() {
 
 
   return (
-    <div>
-      Media recurses
-    </div>
+    <CameraComponent/>
   )
 }
 

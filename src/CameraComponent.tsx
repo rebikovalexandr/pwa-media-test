@@ -1,13 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
 
-export const CameraComponent = () => {
+const CameraComponent = () => {
     const [stream, setStream] = useState<MediaStream | null>(null);
-    const videoRef = useRef<any>();
+    const [facingMode, setFacingMode] = useState<'user' | 'environment'>('user'); // Начальное значение - фронтальная камера
+    const videoRef = useRef<HTMLVideoElement>(null);
 
     useEffect(() => {
         const enableStream = async () => {
             try {
-                const mediaStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+                const mediaStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode }, audio: true });
                 setStream(mediaStream);
                 if (videoRef.current) {
                     videoRef.current.srcObject = mediaStream;
@@ -24,11 +25,23 @@ export const CameraComponent = () => {
                 stream.getTracks().forEach(track => track.stop());
             }
         };
-    }, []);
+    }, [facingMode]);
+
+    const toggleFacingMode = () => {
+        setFacingMode(prevMode => (prevMode === 'user' ? 'environment' : 'user'));
+    };
 
     return (
-        <div>
-            {stream && <video ref={videoRef} autoPlay playsInline  />}
+        <div className='container'>
+            {stream && (
+                <>
+                    <video className='video' ref={videoRef} autoPlay playsInline controls />
+                    <button className='button' onClick={toggleFacingMode}>Переключить камеру</button>
+                </>
+            )}
         </div>
     );
 }
+
+export default CameraComponent;
+
